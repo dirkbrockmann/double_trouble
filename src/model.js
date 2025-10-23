@@ -4,72 +4,85 @@
 
 import param from "./parameters.js"
 import {each,range,map,mean} from "lodash-es"
-import {rad2deg,deg2rad} from "./utils"
+import {rad2deg,deg2rad,rk} from "./utils"
 
 const L = param.L;
 const dt = param.dt;
+const M = param.M;
+const g = param.g;	
 
-// typically objects needed for the explorable
-// are defined here
+var pendulum = [];
+var ghost = [];
 
-var agents = [];
+const doppelpendel=(L,g) => {
+	return function (x){
+		let A= Math.cos(x[0]-x[1]);
+		let g = param.gravity.widget.value() ? param.g : 0;
+		let f = [];
+		f[0] =   (  x[2]-A*x[3]) / (2-A*A);
+		f[1] =   (2*x[3]-A*x[2]) / (2-A*A);
+		f[2] = - f[0]*f[1]*Math.sin(x[0]-x[1]) - 2*g/L*Math.sin(x[0]);
+		f[3] =   f[0]*f[1]*Math.sin(x[0]-x[1]) -   g/L*Math.sin(x[1]);
+		return f;
+	}
+}
+
+const f = doppelpendel(L,g);
 
 // the initialization function, this is bundled in simulation.js with the initialization of
 // the visualization and effectively executed in index.js when the whole explorable is loaded
 
 const initialize = () => {
 
-	// set/reset timer
-	param.timer={}; param.tick=0;
+	param.timer={}; param.T=0;
 
-	// make agents
+	pendulum.state = [param.angle_1.widget.value(),param.angle_2.widget.value(),0,0];
+	ghost.state = [param.angle_1.widget.value(),param.angle_2.widget.value()+param.epsilon,0,0];
+	pendulum.hist = [];
+	ghost.hist = [];
 
-	const N = param.number_of_particles.choices[param.number_of_particles.widget.value()];
-	
-	agents = map(range(N), i => { return {
-				index:i, 
-				x:L*Math.random(), 
-				y:L*Math.random(),
-				theta: 2*Math.PI*Math.random(),
-			} 
+	pendulum.hist.push({ 
+		x:L * Math.cos(pendulum.state[0]-Math.PI/2) + L * Math.cos(pendulum.state[1]-Math.PI/2),
+		y:L * Math.sin(pendulum.state[0]-Math.PI/2) + L * Math.sin(pendulum.state[1]-Math.PI/2)
 	});
+
+	ghost.hist.push({ 
+		x:L * Math.cos(ghost.state[0]-Math.PI/2) + L * Math.cos(ghost.state[1]-Math.PI/2),
+		y:L * Math.sin(ghost.state[0]-Math.PI/2) + L * Math.sin(ghost.state[1]-Math.PI/2)
+	});
+
 	
-};
+}
+
 
 // the go function, this is bundled in simulation.js with the go function of
 // the visualization, typically this is the iteration function of the model that
 // is run in the explorable.
 
 const go  = () => {
-	
-	param.tick++;
-	
-	each(agents,a=>{
-		
-		var dx = dt*param.speed.widget.value()*Math.cos(a.theta);
-		var dy = dt*param.speed.widget.value()*Math.sin(a.theta);
-		
-		const x_new = a.x + dx;
-		const y_new = a.y + dy;
-		
-		if (x_new < 0) {dx+=L};
-		if (y_new < 0) {dy+=L};
-		if (x_new > L) {dx-=L};
-		if (y_new > L) {dy-=L};  
-		
-		a.x += dx;
-		a.y += dy;
-		
-		var neighbors = agents.filter(d =>  (d.x-a.x)**2 + (d.y-a.y)**2 <= param.interaction_radius.widget.value()**2 )
-		
-		var mx = mean(map(neighbors,x=> Math.cos(deg2rad(x.theta))));
-		var my = mean(map(neighbors,x=> Math.sin(deg2rad(x.theta))));	
-		
-		a.theta = rad2deg(Math.atan2(my,mx))
-		
-		a.theta += deg2rad(param.wiggle.widget.value())*(Math.random()-0.5)
-		
-	})
+
+	param.T++;
+	let dy = rk(pendulum.state,f,dt);
+	let dz = rk(ghost.state,f,dt);
+
+	for(let i=0;i<4;i++){ 
+		pendulum.state[i]+=dy[i];
+		ghost.state[i]+=dz[i];  
+	}
+
+	if (pendulum.hist.length > param.trajectory_length) {pendulum.hist.shift()}
+	if (ghost.hist.length > param.trajectory_length) {ghost.hist.shift()}
+
+	pendulum.hist.push({ 
+		x:L * Math.cos(pendulum.state[0]-Math.PI/2) + L * Math.cos(pendulum.state[1]-Math.PI/2),
+		y:L * Math.sin(pendulum.state[0]-Math.PI/2) + L * Math.sin(pendulum.state[1]-Math.PI/2)
+	});
+
+	ghost.hist.push({ 
+		x:L * Math.cos(ghost.state[0]-Math.PI/2) + L * Math.cos(ghost.state[1]-Math.PI/2),
+		y:L * Math.sin(ghost.state[0]-Math.PI/2) + L * Math.sin(ghost.state[1]-Math.PI/2)
+	});
+
 }
 
 // the update function is usually not required for running the explorable. Sometimes
@@ -78,10 +91,23 @@ const go  = () => {
 
 const update = () => {
 	
-	each(agents,x => {x.active = x.index < param.number_of_particles.widget.value() ? true : false})
+pendulum.state = [param.angle_1.widget.value(),param.angle_2.widget.value(),0,0];
+	ghost.state = [param.angle_1.widget.value(),param.angle_2.widget.value()+param.epsilon,0,0];
+	pendulum.hist = [];
+	ghost.hist = [];
+
+	pendulum.hist.push({ 
+		x:L * Math.cos(pendulum.state[0]-Math.PI/2) + L * Math.cos(pendulum.state[1]-Math.PI/2),
+		y:L * Math.sin(pendulum.state[0]-Math.PI/2) + L * Math.sin(pendulum.state[1]-Math.PI/2)
+	});
+
+	ghost.hist.push({ 
+		x:L * Math.cos(ghost.state[0]-Math.PI/2) + L * Math.cos(ghost.state[1]-Math.PI/2),
+		y:L * Math.sin(ghost.state[0]-Math.PI/2) + L * Math.sin(ghost.state[1]-Math.PI/2)
+	});
 
 }
 
 // the three functions initialize, go and update are exported, also all variables
 // that are required for the visualization
-export {agents,initialize,go,update}
+export {pendulum,ghost,initialize,go,update}

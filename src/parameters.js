@@ -1,32 +1,34 @@
-// this object defines the parameters of the model
-// - constants
-// - variables (connected to sliders) properties range and default
-// - choices (connected to radios) properties choices and default
-// - switches (connected to toggles) property default
-// utils.js provides methods for extracting various types of parameters for later use
 
 export default {
-		dt:1,
-		L:100,
-		agentsize: 1.0,
+		dt:0.0125,
+		L:0.95,
+		M:0.1,
+		g:9.81,
+		epsilon:1e-3,
+		trace_length:100,
+		trajectory_length:5000,
 	
-		speed: {
-			range:[0,1],
-			default:0.2
+		angle_1: {
+			range:[-Math.PI+2e-3,Math.PI-2e-3],
+			default:3*Math.PI/4
 		},
-		wiggle: {
-			range:[0,180],
-			default:50
+		angle_2: {
+			range:[-Math.PI,Math.PI],
+			default:3*Math.PI/4
 		},
-		interaction_radius:{
-			range : [0,5],
-			default : 3
+		show_trace: {
+			default: false
 		},
-		number_of_particles : {
-			choices:[50,100,200,400],
-		default:2
+		ghost: {
+			default: false
 		},
-		color_by_heading: {
+		show_entire_trajectory: {
+			default: false
+		},
+		hide_pendulum: {
+			default: false
+		},
+		gravity: {
 			default: true
 		}
 }

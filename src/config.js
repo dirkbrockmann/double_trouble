@@ -7,21 +7,21 @@ export default {
 	widgets:{
 		slider_size: 400,
 		slider_show: true,
-		slider_gap : 1.5,
-		slider_anchor: {x:1,y:8},
-		toggle_anchor: {x:7,y:4},
+		slider_gap : 2,
+		slider_girth: 10,
+		slider_knob:14,
+		slider_anchor: {x:1,y:9},
+		toggle_anchor: {x:7,y:1.25},
 		toggle_label_pos:"right",
-		playbutton_size: 120,
-		playbutton_anchor:{x:3,y:2},
-		backbutton_anchor:{x:4,y:5},
-		resetbutton_anchor:{x:2,y:5},
-		radio_anchor:{x:7,y:2},
-		radio_size:150,
-		radio_orientation:"horizontal",
-		radio_label_position:"top",
-		radio_shape:"rect",
+		toggle_gap:1.25,
+		playbutton_size: 140,
+		playbutton_anchor:{x:3,y:2.5},
+		backbutton_anchor:{x:4,y:5.5},
+		resetbutton_anchor:{x:2,y:5.5}
 	},
 	simulation: {
-		delay:10
+		delay:10,
+		pendulum_thickness:9,
+		pendulum_border:2
 	}
 }

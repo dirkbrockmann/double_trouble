@@ -1,20 +1,101 @@
-.agent {
-	fill: black;
-}
-
 .displayPanel {
   /* Styles for the display panel */
   display: block;
+  line-height: 0;
+  box-sizing: border-box;
 }
 
 .controlPanel {
   /* Styles for the control panel */
   display: block;
+  line-height: 0;
+  box-sizing: border-box;
+}
+
+/* Ensure media children don't introduce baseline descender spacing */
+.displayPanel > canvas,
+.displayPanel > svg,
+.controlPanel > svg,
+.controlPanel > canvas {
+  display: block;
+  box-sizing: border-box;
+}
+
+.leg {
+  stroke: #000;
+  stroke-linecap: round;
+}
+
+.joint{
+
+}
+
+.leg_inset {
+  stroke: rgb(200,200,200);
+  stroke-linecap: round;
+}
+
+.trace {
+	stroke-width:3;
+	stroke:darkred;
+	stroke-linecap: round;
+  fill:none
+}
+
+.trace_ghost {
+	stroke-width:3;
+	stroke:blue;
+	stroke-linecap: round;
+  fill:none
 }
 
 
+.trajectory{
+	stroke-width:1;
+	stroke:red;
+	stroke-linecap: round;
+	fill:none;
+}
+
+.trajectory_ghost{
+	stroke-width:1;
+	stroke:lightblue;
+	stroke-linecap: round;
+	fill:none;
+}
+
+
+
 @media (prefers-color-scheme: dark) {
-	.agent {
-		fill: white;
-	}
+	.leg {
+  stroke: white;
+}
+
+.joint{
+	stroke: white;
+  fill:white
+}
+
+.leg_inset {
+  stroke: rgb(100,100,100);
+}
+
+.trace {
+	stroke:lightcoral;
+}
+
+.trace_ghost {
+	stroke:lightblue;
+}
+
+
+.trajectory{
+	stroke:red;
+}
+
+.trajectory_ghost{
+	stroke:lightblue;
+}
+
+
 }

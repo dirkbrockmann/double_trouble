@@ -12,7 +12,6 @@ export default (controls) => {
 	each(ct.variables, x => x.widget.reset(controls,x.default) );
 	each(ct.booleans, x => x.widget.reset(controls,x.default) );
 	each(ct.choices, x => x.widget.reset(controls,x.default)  );
-	parameters.number_of_particles.widget.update();
 }
 
 

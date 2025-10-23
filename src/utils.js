@@ -24,4 +24,12 @@ const dist = (a,b) => {
 	return Math.sqrt(dx*dx + dy*dy);
 }
 
-export {toArray,add_id_label,add_widget,get_variables,get_booleans,get_choices,deg2rad,rad2deg,dist}
+const rk = (y,f,dt) => {
+	var k1 = f(y);
+	var k2 = f ( y.map(function(yi,i){return yi + dt / 2 * k1[i] }) );
+	var k3 = f ( y.map(function(yi,i){return yi + dt / 2 * k2[i] }) );
+	var k4 = f ( y.map(function(yi,i){return yi + dt * k3[i] }) );
+	return k1.map(function(ki,i){return dt / 6 * (ki+2*k2[i]+2*k3[i]+k4[i])})
+}
+
+export {rk,toArray,add_id_label,add_widget,get_variables,get_booleans,get_choices,deg2rad,rad2deg,dist}

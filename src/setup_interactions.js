@@ -5,12 +5,13 @@
 // to the update() method of an widget object. See below.
 
 
-import {interval} from "d3"
+import {interval,select} from "d3"
 import * as ct from "./controls.js"
 import cfg from "./config.js"
 import param from "./parameters.js"
 import resetparameters from "./reset_parameters.js"
 import {iterate,initialize,update} from "./simulation.js"
+import styles from "./styles.module.css"
 
 var timer = {}
 
@@ -30,6 +31,29 @@ export default (display,controls,config) => {
 	ct.reset.update(()=>resetparameters(controls))	// one button gets the resetparameters() method defined in resetparameters.js
 	ct.go.update(() => startstop(display,config)) // one button gets the startstop function defined above
 	ct.setup.update(() => initialize(display,config)) // this once gets the initialize() method defined in simulation.js
-	param.number_of_particles.widget.update(()=>initialize(display,config)) // here we say that if a specific parameter is changed, in this case the number of particles, we also re_initialize the system (model and visuals)	
+	param.angle_1.widget.update(()=>update(display,config))
+	param.angle_2.widget.update(()=>update(display,config))
+	param.ghost.widget.update(()=>{
+		display.select("#ghost").transition(1000).style("opacity",param.ghost.widget.value() ? 0.2 : 0);
+	})
+	param.show_trace.widget.update(()=>{
+		display.selectAll("."+styles.trace).transition()
+			.style("opacity",param.show_trace.widget.value() ? null : 0);
+		display.selectAll("."+styles.trace_ghost).transition()
+			.style("opacity",param.show_trace.widget.value() ? null : 0);
+	})
+	param.show_entire_trajectory.widget.update(()=>{
+		display.selectAll("."+styles.trajectory).transition()
+			.style("opacity",param.show_entire_trajectory.widget.value() ? null : 0);
+		display.selectAll("."+styles.trajectory_ghost).transition()
+			.style("opacity",param.show_entire_trajectory.widget.value() ? null : 0);
+	})
+
+	param.hide_pendulum.widget.update(()=>{
+		display.selectAll("." + styles.leg).transition(1000).style("opacity",param.hide_pendulum.widget.value() ? 0 : null);
+		display.selectAll("." + styles.leg_inset).transition(1000).style("opacity",param.hide_pendulum.widget.value() ? 0 : null);
+		display.selectAll("." + styles.joint).transition(1000).style("opacity",param.hide_pendulum.widget.value() ? 0 : null);
+	})
+	
 }
 
